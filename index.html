@@ -184,6 +184,8 @@ footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-
 <div class="toast" id="toast"></div>
 
 <script>
+// URL da planilha fixada — visitantes veem as notícias automaticamente
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5OvHV9w-zzvFa-bUTvV2dVEpv_brZJwdUH8KrYhWZBrrKEN87DqjcqiOMz_FXbIG_ZuFjo-vQAGB1/pub?gid=696820550&single=true&output=csv';
 const KEY = 'dga_sheet_url';
 let todas = [], filtroAtual = 'todos';
 
@@ -271,20 +273,14 @@ function filtrar(cat,btn){
 }
 
 async function carregarNoticias(){
-  const url=localStorage.getItem(KEY);
   document.getElementById('loading').classList.remove('show');
   document.getElementById('empty').classList.remove('show');
   document.getElementById('grid').classList.remove('show');
-
-  if(!url){
-    document.getElementById('setup-banner').classList.add('show');
-    document.getElementById('empty').classList.add('show');
-    return;
-  }
-
+  document.getElementById('setup-banner').classList.remove('show');
   document.getElementById('loading').classList.add('show');
+
   try{
-    const res=await fetch(url+'&cb='+Date.now());
+    const res=await fetch(SHEET_URL+'&cb='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const csv=await res.text();
     todas=csvParse(csv);
@@ -292,23 +288,16 @@ async function carregarNoticias(){
     renderNoticias(todas);
     if(todas[0]&&todas[0].atualizado_em)
       document.getElementById('upd-info').textContent='Atualizado: '+todas[0].atualizado_em;
-    if(todas.length) showToast('✓ '+todas.length+' notícias carregadas');
   }catch(e){
     document.getElementById('loading').classList.remove('show');
     document.getElementById('empty').classList.add('show');
-    document.getElementById('etxt').textContent='Erro ao carregar planilha';
-    document.getElementById('esub').textContent='Verifique se a URL está correta';
+    document.getElementById('etxt').textContent='Erro ao carregar notícias';
+    document.getElementById('esub').textContent='Tente recarregar a página em alguns instantes';
     showToast('Erro: '+e.message, true);
   }
 }
 
-function salvarURL(){
-  const url=document.getElementById('sheet-url').value.trim();
-  if(!url||!url.includes('docs.google.com')){showToast('Cole um link válido do Google Sheets',true);return;}
-  localStorage.setItem(KEY,url);
-  document.getElementById('setup-banner').classList.remove('show');
-  carregarNoticias();
-}
+function salvarURL(){ carregarNoticias(); }
 
 document.getElementById('date-badge').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'});
 carregarNoticias();
