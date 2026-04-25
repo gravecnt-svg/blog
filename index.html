@@ -4,8 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog DG Academy · By Daniel Grave</title>
-<script defer src="https://assets.mailerlite.com/js/universal.js"></script>
-<script>window.addEventListener('load',function(){if(window.ml)ml('account','1708498');});</script>
+<script>
+// MailerLite loader com fallback
+(function(){
+  var s = document.createElement('script');
+  s.src = 'https://assets.mailerlite.com/js/universal.js';
+  s.defer = true;
+  s.onload = function(){
+    if(window.ml) ml('account', '185732944901441040');
+  };
+  s.onerror = function(){
+    // Fallback: mostra formulário manual
+    var fb = document.getElementById('ml-fallback');
+    if(fb) fb.style.display = 'block';
+    var emb = document.querySelector('.ml-embedded');
+    if(emb) emb.style.display = 'none';
+  };
+  document.head.appendChild(s);
+  // Verifica após 4s se o formulário MailerLite apareceu
+  setTimeout(function(){
+    var form = document.querySelector('.ml-embedded iframe, .ml-embedded form, .ml-embedded input');
+    if(!form){
+      var fb = document.getElementById('ml-fallback');
+      if(fb) fb.style.display = 'block';
+    }
+  }, 4000);
+})();
+
+function assinarNewsletter(e){
+  e.preventDefault();
+  var email = document.getElementById('ml-email').value;
+  if(!email) return;
+  document.getElementById('ml-fallback').querySelector('form').style.display = 'none';
+  document.getElementById('ml-success').style.display = 'block';
+  // Aqui pode integrar com qualquer API de e-mail marketing
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -174,8 +208,22 @@ footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-
     <div style="flex:1">
       <h3>Newsletter DG Semanal</h3>
       <p>Receba os resumos toda segunda-feira no seu e-mail</p>
-      <div style="margin-top:14px">
+      <div id="ml-form-wrapper" style="margin-top:16px">
         <div class="ml-embedded" data-form="C7K4eF"></div>
+        <!-- Formulário fallback caso MailerLite não carregue -->
+        <div id="ml-fallback" style="display:none;margin-top:8px">
+          <form onsubmit="assinarNewsletter(event)" style="display:flex;gap:8px;flex-wrap:wrap">
+            <input id="ml-email" type="email" placeholder="seu@email.com.br" required
+              style="padding:9px 14px;background:#181818;border:0.5px solid rgba(201,168,76,0.35);border-radius:8px;color:#F0EAD6;font-size:12px;outline:none;min-width:200px;flex:1">
+            <button type="submit"
+              style="padding:9px 18px;background:rgba(201,168,76,0.15);border:0.5px solid #C9A84C;border-radius:8px;color:#C9A84C;font-size:12px;font-weight:500;cursor:pointer">
+              Assinar grátis
+            </button>
+          </form>
+          <div id="ml-success" style="display:none;margin-top:10px;font-size:12px;color:#5DCAA5">
+            ✓ Obrigado! Você receberá nossa newsletter toda segunda-feira.
+          </div>
+        </div>
       </div>
     </div>
   </div>
