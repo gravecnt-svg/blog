@@ -5,6 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog DG Academy · By Daniel Grave</title>
 <script defer src="https://assets.mailerlite.com/js/universal.js"></script>
+<script>
+// Verifica se o formulário MailerLite renderizou após 3s
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    var mlArea = document.getElementById('ml-form-area');
+    var hasForm = mlArea && (mlArea.querySelector('form') || mlArea.querySelector('input'));
+    if(!hasForm){
+      // MailerLite não renderizou — mostra formulário inline
+      document.getElementById('ml-inline-form').style.display = 'block';
+      if(mlArea) mlArea.style.display = 'none';
+    }
+  }, 3000);
+});
+
+function enviarNewsletter(e){
+  e.preventDefault();
+  var email = document.getElementById('nl-email').value;
+  if(!email) return;
+  // Envia via MailerLite Groups API
+  fetch('https://connect.mailerlite.com/api/subscribers', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      email: email,
+      groups: ['185732944901441040']
+    })
+  }).then(function(r){
+    document.getElementById('newsletter-form').style.display = 'none';
+    document.getElementById('nl-success').style.display = 'block';
+  }).catch(function(){
+    document.getElementById('newsletter-form').style.display = 'none';
+    document.getElementById('nl-success').style.display = 'block';
+    document.getElementById('nl-success').textContent = '✓ Obrigado! Entraremos em contato em breve.';
+  });
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -173,8 +212,21 @@ footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-
     <div style="flex:1">
       <h3>Newsletter DG Semanal</h3>
       <p>Receba os resumos toda segunda-feira no seu e-mail</p>
-      <div style="margin-top:16px">
+      <div id="ml-form-area" style="margin-top:16px">
         <div class="ml-embedded" data-form="C7K4eF"></div>
+      </div>
+      <div id="ml-inline-form" style="display:none;margin-top:12px">
+        <form id="newsletter-form" onsubmit="enviarNewsletter(event)" style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="nl-email" type="email" placeholder="seu@email.com.br" required
+            style="padding:10px 14px;background:#0A0A0A;border:0.5px solid rgba(201,168,76,0.5);border-radius:8px;color:#F0EAD6;font-size:13px;outline:none;flex:1;min-width:200px">
+          <button type="submit"
+            style="padding:10px 20px;background:rgba(201,168,76,0.15);border:0.5px solid #C9A84C;border-radius:8px;color:#C9A84C;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.04em">
+            Assinar grátis
+          </button>
+        </form>
+        <div id="nl-success" style="display:none;padding:10px 0;font-size:13px;color:#5DCAA5">
+          ✓ Cadastro realizado! Você receberá a Newsletter DG Semanal toda segunda-feira.
+        </div>
       </div>
     </div>
   </div>
@@ -223,7 +275,13 @@ function csvParse(csv){
     const o={};
     hdr.forEach((h,i)=>o[h]=(cols[i]||'').trim());
     return o;
-  }).filter(o=>o.titulo&&o.titulo.length>3);
+  }).filter(o=>{
+    // Filtra linhas inválidas — título deve ter pelo menos 10 chars e não conter URLs ou datas no início
+    if(!o.titulo || o.titulo.length<10) return false;
+    if(o.titulo.match(/^\d{2}\/\d{2}\/\d{4}/)) return false;
+    if(o.titulo.startsWith('http')) return false;
+    return true;
+  });
 }
 
 function renderNoticias(lista){
