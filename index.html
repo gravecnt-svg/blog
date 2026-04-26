@@ -107,6 +107,19 @@ footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-
 .toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;background:var(--card);border-radius:10px;font-size:12px;max-width:300px;z-index:300;display:none;border:0.5px solid rgba(29,158,117,0.4);color:#5DCAA5}
 .toast.show{display:block}
 .toast.err{border-color:rgba(226,75,74,0.4);color:#F09595}
+.normas-section{margin-top:28px}
+.normas-title{font-size:13px;font-weight:500;color:var(--g1);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.normas-title::after{content:'';flex:1;height:0.5px;background:linear-gradient(90deg,var(--g1),transparent);opacity:0.4}
+.normas-grid{display:flex;flex-direction:column;gap:6px}
+.norma-card{display:flex;align-items:center;gap:12px;padding:10px 14px;border:0.5px solid var(--bgold);border-radius:var(--border-radius-lg);background:var(--card);transition:border-color 0.15s;text-decoration:none}
+.norma-card:hover{border-color:var(--bgoldhi)}
+.norma-tipo{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(201,168,76,0.1);color:var(--g1);border:0.5px solid var(--bgold);white-space:nowrap;flex-shrink:0;font-weight:500;letter-spacing:0.04em}
+.norma-num{font-size:10px;color:var(--ts);white-space:nowrap;flex-shrink:0;min-width:70px}
+.norma-ementa{font-size:12px;color:var(--tm);flex:1;line-height:1.4}
+.norma-data{font-size:10px;color:var(--td);white-space:nowrap;flex-shrink:0}
+.normas-empty{font-size:12px;color:var(--td);text-align:center;padding:16px}
+.normas-link{font-size:11px;color:var(--g1);text-decoration:none;margin-top:10px;display:inline-block;opacity:0.8}
+.normas-link:hover{opacity:1}
 </style>
 </head>
 <body>
@@ -218,6 +231,16 @@ footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-
   <script>fetch("https://assets.mailerlite.com/jsonp/2293035/forms/185733154045167176/takel")</script>
 </div>
 
+  <div class="normas-section" id="normas-section">
+    <div class="normas-title">📋 Normas publicadas · Receita Federal</div>
+    <div class="normas-grid" id="normas-grid">
+      <div class="normas-empty">Carregando normas...</div>
+    </div>
+    <a class="normas-link" href="https://normas.receita.fazenda.gov.br/sijut2consulta/consulta.action" target="_blank" rel="noopener">
+      Ver todas as normas no SIJUT2 →
+    </a>
+  </div>
+
 <footer>
   <div class="foot-brand"><span>DG Academy</span> · Inteligência Tributária</div>
   <div class="foot-ai">Atualização automática às 8h · Google Apps Script<br>Fonte: Receita Federal do Brasil</div>
@@ -227,6 +250,8 @@ footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-
 <script>
 // URL da planilha fixada — visitantes veem as notícias automaticamente
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5OvHV9w-zzvFa-bUTvV2dVEpv_brZJwdUH8KrYhWZBrrKEN87DqjcqiOMz_FXbIG_ZuFjo-vQAGB1/pub?gid=696820550&single=true&output=csv';
+// URL da aba normas — substitua o gid pelo ID correto após publicar a aba normas
+const NORMAS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5OvHV9w-zzvFa-bUTvV2dVEpv_brZJwdUH8KrYhWZBrrKEN87DqjcqiOMz_FXbIG_ZuFjo-vQAGB1/pub?gid=983605151&single=true&output=csv';
 const KEY = 'dga_sheet_url';
 let todas = [], filtroAtual = 'todos';
 
@@ -328,6 +353,38 @@ function filtrar(cat,btn){
   renderNoticias(cat==='todos'?todas:todas.filter(n=>(n.categoria||'').includes(cat)));
 }
 
+async function carregarNormas(){
+  const grid = document.getElementById('normas-grid');
+  if(!grid) return;
+  // Verifica se a URL de normas está configurada
+  if(NORMAS_URL.includes('NORMAS_GID')){
+    grid.innerHTML = '<div class="normas-empty">Configure a URL da aba normas após publicar a planilha.</div>';
+    return;
+  }
+  try{
+    const res = await fetch(NORMAS_URL+'&cb='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const csv = await res.text();
+    const rows = csvParse(csv);
+    if(!rows||rows.length===0){
+      grid.innerHTML = '<div class="normas-empty">Nenhuma norma encontrada. Aguarde a próxima atualização às 8h.</div>';
+      return;
+    }
+    grid.innerHTML = rows.slice(0,12).map(n=>{
+      const url = n.link && n.link.startsWith('http') ? n.link : 'https://normas.receita.fazenda.gov.br/sijut2consulta/consulta.action';
+      const num = n.numero && n.numero !== '—' ? 'Nº '+n.numero+(n.ano?'/'+n.ano:'') : (n.ano||'');
+      return `<a class="norma-card" href="${url}" target="_blank" rel="noopener">
+        <span class="norma-tipo">${n.tipo||'Legislação'}</span>
+        <span class="norma-num">${num}</span>
+        <span class="norma-ementa">${n.ementa||''}</span>
+        <span class="norma-data">${n.data||''}</span>
+      </a>`;
+    }).join('');
+  }catch(e){
+    grid.innerHTML = '<div class="normas-empty">Erro ao carregar normas. Tente recarregar.</div>';
+  }
+}
+
 async function carregarNoticias(){
   document.getElementById('loading').classList.remove('show');
   document.getElementById('empty').classList.remove('show');
@@ -353,7 +410,8 @@ async function carregarNoticias(){
   }
 }
 
-function salvarURL(){ carregarNoticias(); }
+function salvarURL(){ carregarNoticias();
+carregarNormas(); }
 
 document.getElementById('date-badge').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'});
 carregarNoticias();
