@@ -261,10 +261,14 @@ function csvParse(csv){
     hdr.forEach((h,i)=>o[h]=(cols[i]||'').trim());
     return o;
   }).filter(o=>{
-    // Filtra linhas inválidas — título deve ter pelo menos 10 chars e não conter URLs ou datas no início
     if(!o.titulo || o.titulo.length<10) return false;
-    if(o.titulo.match(/^\d{2}\/\d{2}\/\d{4}/)) return false;
+    if(/^\d{2}[\/\-]\d{2}[\/\-]\d{4}/.test(o.titulo)) return false;
     if(o.titulo.startsWith('http')) return false;
+    if(o.titulo.includes('https://')) return false;
+    if(/\d{2}:\d{2}:\d{2}/.test(o.titulo)) return false;
+    if(o.titulo.split(',').length > 3) return false;
+    if(o.titulo === 'Todas as notícias') return false;
+    if(o.resumo && o.resumo.includes('https://') && o.resumo.split(',').length > 4) return false;
     return true;
   });
 }
@@ -292,7 +296,8 @@ function renderNoticias(lista){
         const dois=document.createElement('div'); dois.className='two';
         lista.slice(1,3).forEach(n2=>{
           const c2=n2.categoria||'Geral',l2=catClass(c2);
-          const p2=(n2.resumo||'').split('\n').filter(p=>p.trim())[0]||'';
+          const ps2=(n2.resumo||'').split('\n').filter(p=>p.trim());
+        const p2=(ps2.slice(0,2).join(' ')||'').substring(0,220)+(ps2.join(' ').length>220?'...':'');
           const u2=(n2.fonte_url&&n2.fonte_url.startsWith('http'))?n2.fonte_url:null;
           const e2=document.createElement('div'); e2.className='card-n'; e2.dataset.cat=c2;
           e2.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l2}">${c2}</span><span class="cdate">${n2.data||'Hoje'}</span></div><div class="ct">${n2.titulo}</div><div class="cb">${p2}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u2?`<a class="clink" href="${u2}" target="_blank">Ler →</a>`:''}</div>`;
@@ -302,7 +307,8 @@ function renderNoticias(lista){
       }
       lista.slice(3).forEach(n3=>{
         const c3=n3.categoria||'Geral',l3=catClass(c3);
-        const p3=(n3.resumo||'').split('\n').filter(p=>p.trim())[0]||'';
+        const ps3=(n3.resumo||'').split('\n').filter(p=>p.trim());
+        const p3=(ps3.slice(0,2).join(' ')||'').substring(0,220)+(ps3.join(' ').length>220?'...':'');
         const u3=(n3.fonte_url&&n3.fonte_url.startsWith('http'))?n3.fonte_url:null;
         const e3=document.createElement('div'); e3.className='card-n'; e3.dataset.cat=c3;
         e3.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l3}">${c3}</span><span class="cdate">${n3.data||'Hoje'}</span></div><div class="ct">${n3.titulo}</div><div class="cb">${p3}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u3?`<a class="clink" href="${u3}" target="_blank">Ler →</a>`:''}</div>`;
