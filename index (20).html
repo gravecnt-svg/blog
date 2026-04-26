@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog DG Academy · By Daniel Grave</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#C9A84C;--g2:#E8C96A;--g3:#A07830;
+  --bg:#0A0A0A;--card:#111111;--card2:#181818;
+  --bgold:rgba(201,168,76,0.28);--bgoldhi:rgba(201,168,76,0.6);
+  --tm:#F0EAD6;--ts:rgba(240,234,214,0.52);--td:rgba(240,234,214,0.22)
+}
+html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tm)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+header{border-bottom:0.5px solid var(--bgold);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;background:var(--card);position:sticky;top:0;z-index:100;gap:8px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-sigla{font-size:18px;font-weight:700;letter-spacing:0.06em;color:var(--g1)}
+.logo-sigla span{color:var(--tm)}
+.logo-by{font-size:10px;color:var(--ts);margin-top:2px;letter-spacing:0.04em;font-style:italic}
+.logo-div{width:0.5px;height:24px;background:var(--bgold)}
+.logo-txt{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ts);line-height:1.4}
+.header-r{display:flex;align-items:center;gap:10px}
+.date-badge{font-size:11px;color:var(--ts);padding:4px 12px;border:0.5px solid var(--bgold);border-radius:20px}
+.upd-info{font-size:10px;color:var(--td);line-height:1.5;text-align:right}
+.btn-reload{padding:7px 14px;background:rgba(201,168,76,0.12);border:0.5px solid var(--bgold);border-radius:8px;color:var(--ts);font-size:11px;cursor:pointer;transition:all 0.2s}
+.btn-reload:hover{background:rgba(201,168,76,0.22);color:var(--g1);border-color:var(--g1)}
+.hero{padding:36px 32px 28px;border-bottom:0.5px solid var(--bgold);background:var(--card)}
+.hero-tag{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--g3);margin-bottom:10px;font-weight:500}
+.hero-title{font-size:26px;font-weight:500;color:var(--tm);line-height:1.25;margin-bottom:8px}
+.hero-title span{color:var(--g1)}
+.hero-sub{font-size:13px;color:var(--ts);max-width:500px;line-height:1.7}
+.hero-stats{display:flex;gap:24px;margin-top:20px;flex-wrap:wrap}
+.stat{border-left:2px solid var(--bgold);padding-left:14px}
+.stat-val{font-size:20px;font-weight:500;color:var(--g1);line-height:1}
+.stat-lbl{font-size:10px;color:var(--ts);margin-top:3px}
+.main{max-width:960px;margin:0 auto;padding:24px 32px}
+.auto-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;padding:3px 12px;border-radius:10px;background:rgba(29,158,117,0.08);color:#5DCAA5;border:0.5px solid rgba(29,158,117,0.2);margin-bottom:18px}
+.auto-dot{width:6px;height:6px;border-radius:50%;background:#5DCAA5;animation:pulse 2s ease-in-out infinite}
+.setup-banner{border:0.5px solid var(--bgoldhi);border-radius:12px;padding:22px;background:var(--card);margin-bottom:20px;display:none}
+.setup-banner.show{display:block}
+.setup-title{font-size:14px;font-weight:500;color:var(--tm);margin-bottom:14px}
+.setup-step{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start}
+.snum{width:22px;height:22px;border-radius:50%;background:rgba(201,168,76,0.15);border:0.5px solid var(--g1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--g1);flex-shrink:0;margin-top:2px}
+.stxt{font-size:12px;color:var(--ts);line-height:1.6;flex:1}
+.stxt strong{color:var(--tm)}
+.scode{font-family:monospace;font-size:11px;background:var(--card2);padding:2px 7px;border-radius:4px;color:var(--g2);border:0.5px solid var(--bgold)}
+.input-url{width:100%;padding:10px 14px;background:var(--card2);border:0.5px solid var(--bgold);border-radius:8px;color:var(--tm);font-size:12px;outline:none;margin-top:8px}
+.input-url:focus{border-color:var(--g1)}
+.input-url::placeholder{color:var(--td)}
+.btn-salvar{margin-top:10px;padding:9px 20px;background:rgba(201,168,76,0.15);border:0.5px solid var(--g1);border-radius:8px;color:var(--g1);font-size:12px;font-weight:500;cursor:pointer}
+.btn-salvar:hover{background:rgba(201,168,76,0.28)}
+.filters{display:flex;gap:7px;margin-bottom:20px;flex-wrap:wrap}
+.fbtn{padding:5px 14px;border-radius:20px;border:0.5px solid var(--bgold);background:transparent;color:var(--ts);font-size:11px;cursor:pointer;transition:all 0.15s}
+.fbtn:hover{color:var(--tm);border-color:var(--bgoldhi)}
+.fbtn.active{background:rgba(201,168,76,0.14);color:var(--g1);border-color:var(--g1)}
+.loading{display:none;text-align:center;padding:56px 20px}
+.loading.show{display:block}
+.loading-ic{font-size:26px;color:var(--g1);display:inline-block;margin-bottom:14px;animation:spin 1.2s linear infinite}
+.loading-txt{font-size:13px;color:var(--ts)}
+.empty{display:none;text-align:center;padding:56px 20px}
+.empty.show{display:block}
+.empty-ic{font-size:30px;color:var(--td);margin-bottom:12px}
+.empty-txt{font-size:14px;color:var(--ts);margin-bottom:6px}
+.empty-sub{font-size:12px;color:var(--td)}
+.grid{display:none;flex-direction:column;gap:12px}
+.grid.show{display:flex}
+.card-d{border:0.5px solid var(--bgoldhi);border-radius:12px;padding:22px;background:var(--card)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.ct{font-size:17px;font-weight:500;color:var(--tm);line-height:1.4;margin-bottom:10px}
+.cb{font-size:13px;color:var(--ts);line-height:1.8}
+.cb p{margin-bottom:10px}
+.cb p:last-child{margin-bottom:0}
+.card-n{border:0.5px solid var(--bgold);border-radius:10px;padding:16px 18px;background:var(--card)}
+.card-n .ct{font-size:13px;font-weight:500;color:var(--tm);line-height:1.4;margin-bottom:7px}
+.card-n a:hover .ct,.card-d a:hover .ct{text-decoration:underline;text-decoration-color:var(--g1)}
+.card-n .cb{font-size:12px;color:var(--ts);line-height:1.7}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(max-width:580px){.two{grid-template-columns:1fr}}
+.cbadge{font-size:9px;padding:2px 9px;border-radius:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
+.ci{background:rgba(201,168,76,0.1);color:var(--g1);border:0.5px solid var(--bgold)}
+.cc{background:rgba(56,139,221,0.1);color:#85B7EB;border:0.5px solid rgba(56,139,221,0.25)}
+.cs{background:rgba(29,158,117,0.1);color:#5DCAA5;border:0.5px solid rgba(29,158,117,0.25)}
+.cn{background:rgba(216,90,48,0.1);color:#F0997B;border:0.5px solid rgba(216,90,48,0.25)}
+.cg{background:rgba(240,234,214,0.05);color:var(--ts);border:0.5px solid var(--bgold)}
+.novo{font-size:9px;padding:1px 7px;border-radius:8px;background:rgba(29,158,117,0.1);color:#5DCAA5;border:0.5px solid rgba(29,158,117,0.25)}
+.cfoot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:0.5px solid var(--bgold);flex-wrap:wrap;gap:6px}
+.csrc{font-size:10px;color:var(--td)}
+.clink{font-size:10px;color:var(--g1);text-decoration:none;opacity:0.75}
+.clink:hover{opacity:1}
+.cdate{font-size:10px;color:var(--td)}
+.news-banner{border:0.5px solid var(--bgold);border-radius:10px;padding:20px 24px;background:var(--card2);display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px;flex-wrap:wrap}
+.news-banner h3{font-size:14px;font-weight:500;color:var(--tm);margin-bottom:4px}
+.news-banner p{font-size:12px;color:var(--ts)}
+.news-form{display:flex;gap:8px;flex-wrap:wrap}
+.news-input{padding:8px 14px;background:var(--card);border:0.5px solid var(--bgold);border-radius:8px;color:var(--tm);font-size:12px;outline:none;min-width:190px}
+.news-input::placeholder{color:var(--td)}
+.news-input:focus{border-color:var(--g1)}
+.news-sub{padding:8px 16px;background:rgba(201,168,76,0.14);border:0.5px solid var(--g1);border-radius:8px;color:var(--g1);font-size:12px;font-weight:500;cursor:pointer}
+footer{border-top:0.5px solid var(--bgold);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;margin-top:32px;flex-wrap:wrap;gap:8px}
+.foot-brand{font-size:11px;color:var(--td)}
+.foot-brand span{color:var(--g1)}
+.foot-ai{font-size:10px;color:var(--td);text-align:right;line-height:1.6}
+.toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;background:var(--card);border-radius:10px;font-size:12px;max-width:300px;z-index:300;display:none;border:0.5px solid rgba(29,158,117,0.4);color:#5DCAA5}
+.toast.show{display:block}
+.toast.err{border-color:rgba(226,75,74,0.4);color:#F09595}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div>
+      <div class="logo-sigla">Blog DG <span>Academy</span></div>
+      <div class="logo-by">by Daniel Grave</div>
+    </div>
+  </div>
+  <div class="header-r">
+    <div>
+      <div class="date-badge" id="date-badge">—</div>
+      <div class="upd-info" id="upd-info"></div>
+    </div>
+    <button class="btn-reload" onclick="carregarNoticias()">↻ Recarregar</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">DG Academy · Inteligência Tributária</div>
+  <div class="hero-title">Receita Federal resumida<br>todo dia às <span>8h da manhã</span></div>
+  <div class="hero-sub">Notícias oficiais da Receita Federal resumidas automaticamente em linguagem clara para contadores — 100% gratuito.</div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-val" id="stat-total">—</div><div class="stat-lbl">notícias hoje</div></div>
+    <div class="stat"><div class="stat-val">8h</div><div class="stat-lbl">atualização diária</div></div>
+    <div class="stat"><div class="stat-val">RF</div><div class="stat-lbl">fonte oficial</div></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="auto-badge"><div class="auto-dot"></div>Automação gratuita · Google Apps Script · Receita Federal</div>
+
+  <div class="setup-banner" id="setup-banner">
+    <div class="setup-title">⚙️ Configure a fonte de dados — só uma vez</div>
+    <div class="setup-step"><div class="snum">1</div><div class="stxt">Na sua planilha Google Sheets clique em <strong>Arquivo → Publicar na web</strong></div></div>
+    <div class="setup-step"><div class="snum">2</div><div class="stxt">Selecione a aba <span class="scode">noticias</span> → formato <span class="scode">CSV</span> → clique em <strong>Publicar</strong></div></div>
+    <div class="setup-step"><div class="snum">3</div><div class="stxt">Copie o link gerado e cole abaixo:</div></div>
+    <input class="input-url" id="sheet-url" type="text" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=...&single=true&output=csv">
+    <br>
+    <button class="btn-salvar" onclick="salvarURL()">✓ Salvar e carregar notícias</button>
+  </div>
+
+
+
+  <div class="loading show" id="loading">
+    <div class="loading-ic">◎</div>
+    <div class="loading-txt">Carregando notícias...</div>
+  </div>
+  <div class="empty" id="empty">
+    <div class="empty-ic">◎</div>
+    <div class="empty-txt" id="etxt">Configure a fonte de dados acima</div>
+    <div class="empty-sub" id="esub">Siga os 3 passos para conectar ao Google Sheets</div>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <!-- NEWSLETTER DG SEMANAL -->
+  <div class="news-banner" style="flex-direction:column;align-items:flex-start">
+    <div style="margin-bottom:16px">
+      <h3>Newsletter DG Semanal</h3>
+      <p>Receba os resumos toda segunda-feira no seu e-mail — grátis</p>
+    </div>
+    <div style="width:100%;max-width:500px">
+      <div id="mlb2-40410539" class="ml-form-embedContainer ml-subscribe-form ml-subscribe-form-40410539">
+        <div class="ml-form-align-center">
+          <div class="ml-form-embedWrapper embedForm">
+            <div class="ml-form-embedBody ml-form-embedBodyDefault row-form">
+              <form class="ml-block-form" action="https://assets.mailerlite.com/jsonp/2293035/forms/185733154045167176/subscribe" data-code="" method="post" target="_blank">
+                <div class="ml-form-formContent">
+                  <div class="ml-form-fieldRow ml-last-item">
+                    <div class="ml-field-group ml-field-email ml-validate-email ml-validate-required">
+                      <input aria-label="email" aria-required="true" type="email" class="form-control" name="fields[email]" placeholder="seu@email.com.br" autocomplete="email"
+                        style="background:#0A0A0A!important;color:#F0EAD6!important;border:0.5px solid rgba(201,168,76,0.5)!important;border-radius:8px!important;padding:10px 14px!important;font-size:13px!important;width:100%!important;box-sizing:border-box!important">
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="ml-submit" value="1">
+                <div class="ml-form-embedSubmit" style="margin-top:10px">
+                  <button type="submit" class="primary"
+                    style="background:rgba(201,168,76,0.15)!important;border:0.5px solid #C9A84C!important;border-radius:8px!important;color:#C9A84C!important;font-size:13px!important;font-weight:600!important;padding:10px 20px!important;width:100%!important;cursor:pointer;letter-spacing:0.04em">
+                    Assinar grátis
+                  </button>
+                  <button disabled="disabled" style="display:none" type="button" class="loading">
+                    <div class="ml-form-embedSubmitLoad"></div>
+                  </button>
+                </div>
+                <input type="hidden" name="anticsrf" value="true">
+              </form>
+            </div>
+            <div class="ml-form-successBody row-success" style="display:none;padding:16px 0">
+              <div class="ml-form-successContent">
+                <p style="color:#5DCAA5;font-size:13px">✓ Cadastro realizado! Você receberá a Newsletter DG Semanal toda segunda-feira.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function ml_webform_success_40410539(){
+      var $ = ml_jQuery || jQuery;
+      $('.ml-subscribe-form-40410539 .row-success').show();
+      $('.ml-subscribe-form-40410539 .row-form').hide();
+    }
+  </script>
+  <script src="https://groot.mailerlite.com/js/w/webforms.min.js?vb397d78ebaa8a0f631d35384c46d781b" type="text/javascript"></script>
+  <script>fetch("https://assets.mailerlite.com/jsonp/2293035/forms/185733154045167176/takel")</script>
+</div>
+
+<footer>
+  <div class="foot-brand"><span>DG Academy</span> · Inteligência Tributária</div>
+  <div class="foot-ai">Atualização automática às 8h · Google Apps Script<br>Fonte: Receita Federal do Brasil</div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// URL da planilha fixada — visitantes veem as notícias automaticamente
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5OvHV9w-zzvFa-bUTvV2dVEpv_brZJwdUH8KrYhWZBrrKEN87DqjcqiOMz_FXbIG_ZuFjo-vQAGB1/pub?gid=696820550&single=true&output=csv';
+const KEY = 'dga_sheet_url';
+let todas = [], filtroAtual = 'todos';
+
+function catClass(cat){
+  const c=(cat||'').toLowerCase();
+  if(c.includes('imposto')||c.includes('irpf')||c.includes('irpj')) return 'ci';
+  if(c.includes('cnpj')||c.includes('mei')||c.includes('empresa')) return 'cc';
+  if(c.includes('simples')) return 'cs';
+  if(c.includes('nota')||c.includes('nf')) return 'cn';
+  return 'cg';
+}
+
+function showToast(msg, err){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(err?' err':'');
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+function csvParse(csv){
+  const lines = [];
+  let cur = '', inQ = false;
+  for(let i=0;i<csv.length;i++){
+    const c = csv[i];
+    if(c==='"'){ inQ=!inQ; continue; }
+    if(c==='\n' && !inQ){ lines.push(cur); cur=''; continue; }
+    cur+=c;
+  }
+  if(cur) lines.push(cur);
+  if(lines.length<2) return [];
+  const hdr = lines[0].split(',').map(h=>h.trim());
+  return lines.slice(1).map(line=>{
+    const cols=[]; let f='', q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){q=!q;continue;}
+      if(c===','&&!q){cols.push(f);f='';continue;}
+      f+=c;
+    }
+    cols.push(f);
+    const o={};
+    hdr.forEach((h,i)=>o[h]=(cols[i]||'').trim());
+    return o;
+  }).filter(o=>{
+    if(!o.titulo||o.titulo.length<8) return false;
+    if(o.titulo.startsWith('http')) return false;
+    if(['Todas as notícias','Fisco: Últimas Notícias','Receita Federal: Todas as notícias'].includes(o.titulo)) return false;
+    return true;
+  });
+}
+
+function renderNoticias(lista){
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  grid.innerHTML=''; grid.classList.remove('show'); empty.classList.remove('show');
+  document.getElementById('stat-total').textContent=lista.length||'0';
+  if(!lista||!lista.length){empty.classList.add('show');return;}
+  grid.classList.add('show');
+
+  lista.forEach((n,i)=>{
+    const cat=n.categoria||'Geral', cls=catClass(cat);
+    const pars=(n.resumo||'').split('|||').filter(p=>p.trim()).slice(0,3);
+    const url=(n.fonte_url&&n.fonte_url.startsWith('http'))?n.fonte_url:null;
+
+    if(i===0){
+      const el=document.createElement('div');
+      el.className='card-d'; el.dataset.cat=cat;
+      el.innerHTML=`<div class="ch"><span class="cbadge ${cls}">${cat}</span><div style="display:flex;align-items:center;gap:8px"><span class="novo">Novo</span><span class="cdate">${n.data||'Hoje'}</span></div></div>${url?`<a href="${url}" target="_blank" rel="noopener" style="text-decoration:none;display:block"><div class="ct" style="color:var(--tm)">${n.titulo}</div></a>`:`<div class="ct">${n.titulo}</div>`}<div class="cb">${pars.map(p=>`<p>${p}</p>`).join('')}</div><div class="cfoot"><span class="csrc">Fonte: Receita Federal do Brasil</span>${url?`<a class="clink" href="${url}" target="_blank" rel="noopener">Ler notícia completa →</a>`:''}</div>`;
+      grid.appendChild(el);
+
+      if(lista.length>1){
+        const dois=document.createElement('div'); dois.className='two';
+        lista.slice(1,3).forEach(n2=>{
+          const c2=n2.categoria||'Geral',l2=catClass(c2);
+          const ps2=(n2.resumo||'').split('|||').filter(p=>p.trim());
+        const p2=(ps2.slice(0,2).join(' ')||'').substring(0,220)+(ps2.join(' ').length>220?'...':'');
+          const u2=(n2.fonte_url&&n2.fonte_url.startsWith('http'))?n2.fonte_url:null;
+          const e2=document.createElement('div'); e2.className='card-n'; e2.dataset.cat=c2;
+          e2.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l2}">${c2}</span><span class="cdate">${n2.data||'Hoje'}</span></div><div class="ct">${n2.titulo}</div><div class="cb">${p2}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u2?`<a class="clink" href="${u2}" target="_blank">Ler notícia →</a>`:''}</div>`;
+          dois.appendChild(e2);
+        });
+        grid.appendChild(dois);
+      }
+      lista.slice(3).forEach(n3=>{
+        const c3=n3.categoria||'Geral',l3=catClass(c3);
+        const ps3=(n3.resumo||'').split('|||').filter(p=>p.trim());
+        const p3=(ps3.slice(0,2).join(' ')||'').substring(0,220)+(ps3.join(' ').length>220?'...':'');
+        const u3=(n3.fonte_url&&n3.fonte_url.startsWith('http'))?n3.fonte_url:null;
+        const e3=document.createElement('div'); e3.className='card-n'; e3.dataset.cat=c3;
+        e3.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l3}">${c3}</span><span class="cdate">${n3.data||'Hoje'}</span></div><div class="ct">${n3.titulo}</div><div class="cb">${p3}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u3?`<a class="clink" href="${u3}" target="_blank">Ler notícia →</a>`:''}</div>`;
+        grid.appendChild(e3);
+      });
+    }
+  });
+}
+
+function filtrar(cat,btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); filtroAtual=cat;
+  renderNoticias(cat==='todos'?todas:todas.filter(n=>(n.categoria||'').includes(cat)));
+}
+
+async function carregarNoticias(){
+  document.getElementById('loading').classList.remove('show');
+  document.getElementById('empty').classList.remove('show');
+  document.getElementById('grid').classList.remove('show');
+  document.getElementById('setup-banner').classList.remove('show');
+  document.getElementById('loading').classList.add('show');
+
+  try{
+    const res=await fetch(SHEET_URL+'&cb='+Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const csv=await res.text();
+    todas=csvParse(csv);
+    document.getElementById('loading').classList.remove('show');
+    renderNoticias(todas);
+    if(todas[0]&&todas[0].atualizado_em)
+      document.getElementById('upd-info').textContent='Atualizado: '+todas[0].atualizado_em;
+  }catch(e){
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('empty').classList.add('show');
+    document.getElementById('etxt').textContent='Erro ao carregar notícias';
+    document.getElementById('esub').textContent='Tente recarregar a página em alguns instantes';
+    showToast('Erro: '+e.message, true);
+  }
+}
+
+function salvarURL(){ carregarNoticias(); }
+
+document.getElementById('date-badge').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'});
+carregarNoticias();
+</script>
+</body>
+</html>
