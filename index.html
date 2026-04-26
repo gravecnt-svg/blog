@@ -267,8 +267,9 @@ function csvParse(csv){
     if(o.titulo.includes('https://')) return false;
     if(/\d{2}:\d{2}:\d{2}/.test(o.titulo)) return false;
     if(o.titulo.split(',').length > 3) return false;
-    if(o.titulo === 'Todas as notícias') return false;
+    if(['Todas as notícias','Últimas notícias da Receita Federal'].includes(o.titulo)) return false;
     if(o.resumo && o.resumo.includes('https://') && o.resumo.split(',').length > 4) return false;
+    if(o.titulo.toLowerCase().includes('todas as notícias')) return false;
     return true;
   });
 }
@@ -289,7 +290,9 @@ function renderNoticias(lista){
     if(i===0){
       const el=document.createElement('div');
       el.className='card-d'; el.dataset.cat=cat;
-      el.innerHTML=`<div class="ch"><span class="cbadge ${cls}">${cat}</span><div style="display:flex;align-items:center;gap:8px"><span class="novo">Novo</span><span class="cdate">${n.data||'Hoje'}</span></div></div><div class="ct">${n.titulo}</div><div class="cb">${pars.map(p=>`<p>${p}</p>`).join('')}</div><div class="cfoot"><span class="csrc">Fonte: Receita Federal do Brasil</span>${url?`<a class="clink" href="${url}" target="_blank">Ler completo →</a>`:''}</div>`;
+      if(url) el.style.cursor='pointer';
+      if(url) el.onclick=()=>window.open(url,'_blank');
+      el.innerHTML=`<div class="ch"><span class="cbadge ${cls}">${cat}</span><div style="display:flex;align-items:center;gap:8px"><span class="novo">Novo</span><span class="cdate">${n.data||'Hoje'}</span></div></div><div class="ct">${n.titulo}</div><div class="cb">${pars.map(p=>`<p>${p}</p>`).join('')}</div><div class="cfoot"><span class="csrc">Fonte: Receita Federal do Brasil</span>${url?`<a class="clink" href="${url}" target="_blank">Ler notícia completa →</a>`:''}</div>`;
       grid.appendChild(el);
 
       if(lista.length>1){
@@ -300,7 +303,9 @@ function renderNoticias(lista){
         const p2=(ps2.slice(0,2).join(' ')||'').substring(0,220)+(ps2.join(' ').length>220?'...':'');
           const u2=(n2.fonte_url&&n2.fonte_url.startsWith('http'))?n2.fonte_url:null;
           const e2=document.createElement('div'); e2.className='card-n'; e2.dataset.cat=c2;
-          e2.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l2}">${c2}</span><span class="cdate">${n2.data||'Hoje'}</span></div><div class="ct">${n2.titulo}</div><div class="cb">${p2}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u2?`<a class="clink" href="${u2}" target="_blank">Ler →</a>`:''}</div>`;
+          if(u2) e2.style.cursor='pointer';
+          if(u2) e2.onclick=()=>window.open(u2,'_blank');
+          e2.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l2}">${c2}</span><span class="cdate">${n2.data||'Hoje'}</span></div><div class="ct">${n2.titulo}</div><div class="cb">${p2}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u2?`<a class="clink" href="${u2}" target="_blank">Ler notícia →</a>`:''}</div>`;
           dois.appendChild(e2);
         });
         grid.appendChild(dois);
@@ -311,7 +316,9 @@ function renderNoticias(lista){
         const p3=(ps3.slice(0,2).join(' ')||'').substring(0,220)+(ps3.join(' ').length>220?'...':'');
         const u3=(n3.fonte_url&&n3.fonte_url.startsWith('http'))?n3.fonte_url:null;
         const e3=document.createElement('div'); e3.className='card-n'; e3.dataset.cat=c3;
-        e3.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l3}">${c3}</span><span class="cdate">${n3.data||'Hoje'}</span></div><div class="ct">${n3.titulo}</div><div class="cb">${p3}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u3?`<a class="clink" href="${u3}" target="_blank">Ler →</a>`:''}</div>`;
+        if(u3) e3.style.cursor='pointer';
+        if(u3) e3.onclick=()=>window.open(u3,'_blank');
+        e3.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:4px"><span class="cbadge ${l3}">${c3}</span><span class="cdate">${n3.data||'Hoje'}</span></div><div class="ct">${n3.titulo}</div><div class="cb">${p3}</div><div class="cfoot"><span class="csrc">Receita Federal</span>${u3?`<a class="clink" href="${u3}" target="_blank">Ler notícia →</a>`:''}</div>`;
         grid.appendChild(e3);
       });
     }
